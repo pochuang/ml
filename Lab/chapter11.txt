@@ -1,0 +1,332 @@
+﻿http://blog.kaggle.com/2017/10/17/planet-understanding-the-amazon-from-space-1st-place-winners-interview/
+
+import pandas as pd
+from sklearn import svm, metrics, cross_validation
+wine_df = pd.read_csv('C:\pyml_scripts\chapter11_ensemble\winequality-red.csv',sep=';')
+wine_data = wine_df.drop('quality',axis=1)
+wine_label = wine_df["quality"]
+train_data, test_data, train_label, test_label = cross_validation.train_test_split(wine_data, wine_label)
+
+
+#設定使用Bagging
+from sklearn.ensemble import BaggingClassifier
+
+#弱學習器全都使用KNN,每次取65%資料量與65%特徵量
+from sklearn.neighbors import KNeighborsClassifier
+bcknn = BaggingClassifier(base_estimator=KNeighborsClassifier(),n_estimators=50,bootstrap=True,bootstrap_features=True,max_samples=0.65,max_features=0.65)
+bcknn.fit(train_data, train_label)
+pred = bcknn.predict(test_data)
+ac_score = metrics.accuracy_score(test_label, pred)
+print("Bagging kNN Accurancy : ", ac_score)
+#('Bagging kNN Accurancy : ', 0.84999999999999998)
+
+>>> bcknn.base_estimator_
+KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform')
+		   
+>>> bcknn.estimators_
+[KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform'), KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+           metric_params=None, n_jobs=1, n_neighbors=5, p=2,
+           weights='uniform')]
+
+#使用LinearRegression
+from sklearn.linear_model import LinearRegression
+bcreg =  BaggingClassifier(base_estimator=LinearRegression(),n_estimators=50,bootstrap=True,bootstrap_features=True,max_samples=0.65,max_features=0.65)
+bcreg.fit(train_data, train_label)
+pred = bcreg.predict(test_data)
+ac_score = metrics.accuracy_score(test_label, pred)
+print("Bagging Regression Accurancy : ", ac_score)
+
+
+
+#設定使用RandomForest
+from sklearn.ensemble import RandomForestClassifier
+rfc = RandomForestClassifier(n_estimators=50,criterion='entropy')
+rfc.fit(train_data, train_label)
+pred = rfc.predict(test_data)
+ac_score = metrics.accuracy_score(test_label, pred)
+print("Random Forest Accurancy : ", ac_score)
+
+
+#設定使用ExtraTrees
+from sklearn.ensemble import ExtraTreesClassifier
+etc = ExtraTreesClassifier(n_estimators=50,criterion='entropy')
+etc.fit(train_data, train_label)
+pred = etc.predict(test_data)
+ac_score = metrics.accuracy_score(test_label, pred)
+print("Extra Trees Accurancy : ", ac_score)
+
+
+#設定使用Boosting
+from sklearn.ensemble import AdaBoostClassifier
+abc = AdaBoostClassifier(n_estimators=50)
+abc.fit(train_data,train_label)
+pred = abc.predict(test_data)
+ac_score = metrics.accuracy_score(test_label, pred)
+print("AdaBoosting Accurancy : ", ac_score)
+
+
+from sklearn.ensemble import GradientBoostingClassifier
+gbc = GradientBoostingClassifier(n_estimators=50)
+gbc.fit(train_data,train_label)
+pred = gbc.predict(test_data)
+ac_score = metrics.accuracy_score(test_label, pred)
+print("Gradient Descent Accurancy : ", ac_score)
+
+
+#使用Voting ensemble
+from sklearn.ensemble import VotingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+est = []
+m1 = LogisticRegression()
+est.append(('logistic',m1))
+m2 = DecisionTreeClassifier()
+est.append(('cart',m2))
+m3 = SVC()
+est.append(('svm',m3))
+
+>>> est
+[('logistic', LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+          intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,
+          penalty='l2', random_state=None, solver='liblinear', tol=0.0001,
+          verbose=0, warm_start=False)), ('cart', DecisionTreeClassifier(class_weight=None, criterion='gini',
+max_depth=None,
+            max_features=None, max_leaf_nodes=None,
+            min_impurity_split=1e-07, min_samples_leaf=1,
+            min_samples_split=2, min_weight_fraction_leaf=0.0,
+            presort=False, random_state=None, splitter='best')), ('svm', SVC(C=1.0, cache_size=200, class_weig
+ht=None, coef0=0.0,
+  decision_function_shape=None, degree=3, gamma='auto', kernel='rbf',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False))]
+
+vc = VotingClassifier(est)
+vc.fit(train_data,train_label)
+pred = vc.predict(test_data)
+sc_score = metrics.accuracy_score(test_label,pred)
+print("Voting ensemble Accurancy : ",ac_score)
+
+
+
+Stacked-Generalization
+#使用mlxtend module
+C:\> pip install mlxtend
+
+#窮舉法,找出最佳參數值
+from sklearn.grid_search import GridSearchCV
+from sklearn.datasets import make_classification
+from sklearn.ensemble import RandomForestClassifier
+# Build a classification task using 3 informative features
+X, y = make_classification(n_samples=1000,
+                           n_features=10,
+                           n_informative=3,
+                           n_redundant=0,
+                           n_repeated=0,
+                           n_classes=2,
+                           random_state=0,
+                           shuffle=False)
+
+
+rfc = RandomForestClassifier(n_jobs=-1,max_features= 'sqrt' ,n_estimators=50, oob_score = True) 
+
+param_grid = { 
+    'n_estimators': [10, 500],
+    'max_features': ['auto', 'sqrt', 'log2']
+}
+
+CV_rfc = GridSearchCV(estimator=rfc, param_grid=param_grid, cv= 5)
+CV_rfc.fit(X, y)
+#要等好一陣子
+print CV_rfc.best_params_
+
+>>> print CV_rfc.best_params_
+{'max_features': 'auto', 'n_estimators': 200}
+
+
+C:\>pip install mlxtend
+
+# Stacked-Generalization
+from sklearn import datasets
+
+iris = datasets.load_iris()
+X, y = iris.data[:, 1:3], iris.target
+
+from sklearn import model_selection
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB 
+from sklearn.ensemble import RandomForestClassifier
+from mlxtend.classifier import StackingClassifier
+import numpy as np
+
+clf1 = KNeighborsClassifier(n_neighbors=1)
+clf2 = RandomForestClassifier(random_state=1)
+clf3 = GaussianNB()
+lr = LogisticRegression()
+sclf = StackingClassifier(classifiers=[clf1, clf2, clf3], meta_classifier=lr)
+
+print('3-fold cross validation:\n')
+
+for clf, label in zip([clf1, clf2, clf3, sclf], ['KNN', 'Random Forest', 'Naive Bayes','StackingClassifier']):
+    scores = model_selection.cross_val_score(clf, X, y, cv=3, scoring='accuracy')
+    print("Accuracy: %0.2f (+/- %0.2f) [%s]"  % (scores.mean(), scores.std(), label))
+
+===============================================================================================================
+Accuracy: 0.91 (+/- 0.01) [KNN]
+Accuracy: 0.91 (+/- 0.06) [Random Forest]
+Accuracy: 0.92 (+/- 0.03) [Naive Bayes]
+Accuracy: 0.95 (+/- 0.03) [StackingClassifier]	
+===============================================================================================================
+	
+import matplotlib.pyplot as plt
+from mlxtend.plotting import plot_decision_regions
+import matplotlib.gridspec as gridspec
+import itertools
+
+gs = gridspec.GridSpec(2, 2)
+
+fig = plt.figure(figsize=(10,8))
+
+for clf, lab, grd in zip([clf1, clf2, clf3, sclf], ['KNN', 'Random Forest', 'Naive Bayes','StackingClassifier'],itertools.product([0, 1], repeat=2)):
+    clf.fit(X, y)
+    ax = plt.subplot(gs[grd[0], grd[1]])
+    fig = plot_decision_regions(X=X, y=y, clf=clf)
+    plt.title(lab)
+
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+import itertools
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from mlxtend.classifier import EnsembleVoteClassifier
+from mlxtend.data import iris_data
+from mlxtend.plotting import plot_decision_regions
+
+# Initializing Classifiers
+clf1 = LogisticRegression(random_state=0)
+clf2 = RandomForestClassifier(random_state=0)
+clf3 = SVC(random_state=0, probability=True)
+eclf = EnsembleVoteClassifier(clfs=[clf1, clf2, clf3],weights=[2, 1, 1], voting='soft')
+
+# Loading some example data
+X, y = iris_data()
+X = X[:,[0, 2]]
+
+# Plotting Decision Regions
+
+gs = gridspec.GridSpec(2, 2)
+fig = plt.figure(figsize=(10, 8))
+
+labels = ['Logistic Regression','Random Forest','RBF kernel SVM','Ensemble']
+
+for clf, lab, grd in zip([clf1, clf2, clf3, eclf],labels,itertools.product([0, 1],repeat=2)):
+    clf.fit(X, y)
+    ax = plt.subplot(gs[grd[0], grd[1]])
+    fig = plot_decision_regions(X=X, y=y,clf=clf, legend=2)
+    plt.title(lab)
+
+plt.show()
+

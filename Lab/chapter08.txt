@@ -1,0 +1,220 @@
+http://home.deib.polimi.it/matteucc/Clustering/tutorial_html/AppletKM.html
+https://www.naftaliharris.com/blog/visualizing-k-means-clustering/
+https://www.naftaliharris.com/blog/visualizing-dbscan-clustering/
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+cluster1=np.random.uniform(0.5,2.5,(2,10))
+cluster2=np.random.uniform(2.5,4.5,(2,10))
+X=np.hstack((cluster1,cluster2)).T
+X
+             0              1
+array([[ 1.93333325,  1.14773177],  0
+       [ 0.93209419,  2.16667858],  1
+       [ 1.17443679,  1.02558168],  2
+       [ 1.03169175,  1.33065443],
+       [ 2.35023198,  1.56961069],
+       [ 2.00386639,  0.97449017],
+       [ 1.53731475,  1.41787053],
+       [ 2.03151942,  0.95626483],
+       [ 1.29227136,  2.34602699],
+       [ 0.69490352,  2.20351829],
+       [ 4.00169358,  2.50641121],
+       [ 2.84705259,  3.46349438],
+       [ 2.85310616,  3.06093291],
+       [ 2.762089  ,  3.09377412],
+       [ 3.61081419,  3.04862534],
+       [ 3.47543497,  3.98564962],
+       [ 2.56456489,  2.86935345],
+       [ 3.28122185,  2.97056436],
+       [ 3.1682502 ,  4.09640788],
+       [ 3.91728673,  3.72131869]])
+
+plt.plot(X[:,0],X[:,1],'k.')
+
+kmeans_k2=KMeans(n_clusters=2)
+kmeans_k2.fit(X)
+
+kmeans_k2.labels_
+
+kmeans_k2.cluster_centers_
+array([[ 1.49816634,  1.5138428 ],
+       [ 3.24815142,  3.2816532 ]])
+
+colors = ["g.","r.","c.","y."]
+
+labels = kmeans_k2.labels_
+
+for i in range(len(X)):
+     plt.plot(X[i][0],X[i][1],colors[labels[i]])
+
+
+kmeans_k3=KMeans(n_clusters=3)
+kmeans_k3.fit(X)
+
+labels = kmeans_k3.labels_
+for i in range(len(X)):
+     plt.plot(X[i][0],X[i][1],colors[labels[i]])
+
+kmeans_k2.predict([1,2.5])
+kmeans_k3.predict([1,2.5])
+
+--輪廓係數(在-1~1之間,越大表示clusters數量越適當)
+import numpy as np
+import matplotlib.pyplot as plt
+cluster1=np.random.uniform(0.5,2.5,(2,10))
+cluster2=np.random.uniform(2.5,4.5,(2,10))
+X=np.hstack((cluster1,cluster2)).T
+plt.figure()
+plt.axis([0,5,0,5])
+plt.grid(True)
+plt.plot(X[:,0],X[:,1],'k.')
+plt.show()
+
+from sklearn.cluster import KMeans
+from scipy.spatial.distance import cdist
+K=range(1,10)
+meandistortions=[]
+for k in K:
+    kmeans=KMeans(n_clusters=k)
+    kmeans.fit(X)
+    meandistortions.append(sum(np.min(cdist(X,kmeans.cluster_centers_,'euclidean'),axis=1))/X.shape[0])
+
+
+plt.plot(K,meandistortions,'bx-')
+plt.xlabel('k')
+plt.ylabel('Average distortion')
+plt.title('Selecting k with the Elbow Method')
+plt.show()
+
+from sklearn import metrics
+plt.figure(figsize=(8, 10)) 
+plt.subplot(3, 2, 1)
+x1 = np.array([1, 2, 3, 1, 5, 6, 5, 5, 6, 7, 8, 9, 7, 9])
+x2 = np.array([1, 3, 2, 2, 8, 6, 7, 6, 7, 1, 2, 1, 1, 3])
+X = np.array(list(zip(x1, x2))).reshape(len(x1), 2)
+plt.xlim([0, 10])
+plt.ylim([0, 10])
+plt.title('Instances')
+plt.scatter(x1, x2)
+colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'b']
+markers = ['o', 's', 'D', 'v', '^', 'p', '*', '+']
+tests = [2, 3, 4, 5, 8]
+subplot_counter = 1
+for t in tests:
+    subplot_counter += 1
+    plt.subplot(3, 2, subplot_counter)
+    kmeans_model = KMeans(n_clusters=t).fit(X)
+    for i, l in enumerate(kmeans_model.labels_):
+        plt.plot(x1[i], x2[i], color=colors[l], marker=markers[l],ls='None')
+        plt.xlim([0, 10])
+        plt.ylim([0, 10])
+        plt.title('K = %s, silhouette coefficient = %.03f' % (t, metrics.silhouette_score(X, kmeans_model.labels_,metric='euclidean')))
+        
+
+plt.show()
+
+--圖檔轉換
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+import numpy as np
+from PIL import Image
+import sys
+
+fp = open("C:\pyml_scripts\chapter08_kmeans\shutterstock.jpg","rb")
+im = Image.open(fp)
+m,n = im.size
+
+data = []
+for i in xrange(m):
+    for j in xrange(n):
+        tmp = []
+        x,y,z = im.getpixel((i,j))
+        tmp.append(x/256.0)
+        tmp.append(y/256.0)
+        tmp.append(z/256.0)
+        data.append(tmp)
+
+fp.close
+data1 = np.mat(data)
+
+
+# 自行變更clusters數量
+data2=KMeans(n_clusters=2)
+
+data2.fit(data1)
+
+data2.cluster_centers_
+
+f_center = data2.cluster_centers_
+center=[]
+
+for line in f_center:
+    tmp = []
+    for x in line:
+        tmp.append(int(float(x)*256))
+    center.append(tuple(tmp))
+
+
+pic_new = Image.new("RGB",(m,n))
+data2.labels_
+i = 0
+for line in data2.labels_:
+    index_n = int(line)
+    pic_new.putpixel(((i/n),(i%n)),center[index_n])
+    i = i + 1
+
+
+pic_new.save("result2.jpg","JPEG")
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+#n_clusters = int(sys.argv[1])
+# 自行變更clusters數量
+n_clusters = 5
+data5=KMeans(n_clusters=n_clusters)
+
+data5.fit(data1)
+
+data5.cluster_centers_
+
+f_center = data5.cluster_centers_
+center=[]
+
+for line in f_center:
+    tmp = []
+    for x in line:
+        tmp.append(int(float(x)*256))
+    center.append(tuple(tmp))
+
+
+pic_new = Image.new("RGB",(m,n))
+data5.labels_
+i = 0
+for line in data5.labels_:
+    index_n = int(line)
+    pic_new.putpixel(((i/n),(i%n)),center[index_n])
+    i = i + 1
+
+#存檔時，記得變更檔名
+pic_new.save("result5.jpg","JPEG")
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+儲存Model
+>>> kmeans_k2.labels_
+array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+>>> from sklearn.externals import joblib
+>>> joblib.dump(kmeans_k2,"c:\pyml_scripts\kmeans_k2.m")
+['c:\\pyml_scripts\\kmeans_k2.m']
+>>> exit()
+
+C:\Users\Administrator>python
+>>> from sklearn.externals import joblib
+>>> kmeans_k2=joblib.load("c:\pyml_scripts\kmeans_k2.m")
+>>> kmeans_k2.labels_
+array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+>>> kmeans_k2.predict(5,5)
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+各種cluster演算法的比較
+http://scikit-learn.org/stable/modules/clustering.html

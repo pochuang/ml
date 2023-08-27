@@ -1,0 +1,212 @@
+﻿import numpy as np
+from sklearn.neighbors import NearestNeighbors
+import matplotlib.pyplot as plt
+X = np.array([[-1,-1],[-2,-1],[-3,-2],[1,1],[2,1],[3,2]])
+Xx = X[:,0]
+Xy = X[:,1]
+
+--[‘auto’, ‘ball_tree’, ‘kd_tree’, ‘brute’]
+nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(X)
+nbrs
+distances, indices = nbrs.kneighbors(X)
+
+>>> X
+array([[-1, -1],
+       [-2, -1],
+       [-3, -2],
+       [ 1,  1],
+       [ 2,  1],
+       [ 3,  2]])
+
+>>> indices
+array([[0, 1],
+       [1, 0],
+       [2, 1],
+       [3, 4],
+       [4, 3],
+       [5, 4]])
+
+
+>>> distances
+array([[ 0.        ,  1.        ],
+       [ 0.        ,  1.        ],
+       [ 0.        ,  1.41421356],
+       [ 0.        ,  1.        ],
+       [ 0.        ,  1.        ],
+       [ 0.        ,  1.41421356]])
+
+>>> nbrs.kneighbors_graph(X).toarray()
+array([[ 1.,  1.,  0.,  0.,  0.,  0.],
+       [ 1.,  1.,  0.,  0.,  0.,  0.],
+       [ 0.,  1.,  1.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  1.,  1.,  0.],
+       [ 0.,  0.,  0.,  1.,  1.,  0.],
+       [ 0.,  0.,  0.,  0.,  1.,  1.]])
+
+nbrs = NearestNeighbors(n_neighbors=3, algorithm='ball_tree').fit(X)
+distances, indices = nbrs.kneighbors(X)
+
+
+>>> indices
+array([[0, 1, 2],
+       [1, 0, 2],
+       [2, 1, 0],
+       [3, 4, 5],
+       [4, 3, 5],
+       [5, 4, 3]])
+>>> distances
+array([[ 0.        ,  1.        ,  2.23606798],
+       [ 0.        ,  1.        ,  1.41421356],
+       [ 0.        ,  1.41421356,  2.23606798],
+       [ 0.        ,  1.        ,  2.23606798],
+       [ 0.        ,  1.        ,  1.41421356],
+       [ 0.        ,  1.41421356,  2.23606798]])
+
+plt.scatter(Xx,Xy)
+plt.show()
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+df = pd.DataFrame(np.random.random([1000,2])*100,columns=['x','y'])
+df.plot(kind='scatter',x='x',y='y')
+
+from sklearn.neighbors import NearestNeighbors
+nbrs = NearestNeighbors( n_neighbors=10, algorithm='ball_tree', metric='euclidean' ).fit( df[['x', 'y']].values )
+
+#找出與[50,50]最接近的3個點
+nbrs.kneighbors([[50,50]],3)
+(array([[ 0.51558517,  2.50462273,  2.59875109]]),
+ array([[110,  13, 274]], dtype=int64))
+ 
+distances, indices = nbrs.kneighbors(df)
+
+>>> df[['x','y']].ix[0]
+x    69.015924
+y    45.045461
+Name: 0, dtype: float64
+>>> df[['x','y']].ix[100]
+x    6.527400
+y    2.007039
+Name: 100, dtype: float64
+>>> df[['x','y']].ix[200]
+x     5.737370
+y    50.778206
+Name: 200, dtype: float64
+>>> df[['x','y']].ix[300]
+x    48.967847
+y    27.062599
+Name: 300, dtype: float64
+
+>>> indices[0]
+array([  0, 483, 463,  45, 205, 203, 191, 769, 722, 859])
+>>> indices[100]
+array([100, 558, 310, 520, 681,   7, 642, 942, 822, 114])
+>>> indices[200]
+array([200,  19,  26, 685, 221, 493,  85, 442, 293, 424])
+>>> indices[300]
+array([300, 335, 793, 413, 706, 639, 518, 966, 421, 140])
+
+>>> df[['x','y']].ix[0]
+x    50.561080
+y    52.644053
+Name: 0, dtype: float64
+>>> df[['x','y']].ix[100]
+x    24.673623
+y     0.296342
+Name: 100, dtype: float64
+>>> df[['x','y']].ix[200]
+x     4.380107
+y    91.265670
+Name: 200, dtype: float64
+>>> df[['x','y']].ix[300]
+x    39.286781
+y    12.298607
+Name: 300, dtype: float64
+
+>>> indices
+array([[  0, 483, 463, ..., 769, 722, 859],
+       [  1, 960, 467, ..., 630, 171, 798],
+       [  2,  49, 270, ..., 268, 201, 947],
+       ...,
+       [997, 514,  46, ..., 226,  37, 747],
+       [998, 301, 622, ..., 928, 828, 618],
+       [999, 254,  83, ..., 617, 139, 409]])
+>>> indices.size
+10000
+>>> indices.shape
+(1000, 10)
+
+
+ax = df.plot( kind='scatter', x='x', y='y' )
+df.ix[ indices[0] ].plot( kind='scatter', x='x', y='y', ax=ax, color='red' )
+df.ix[ indices[100] ].plot( kind='scatter', x='x', y='y', ax=ax, color='yellow' )
+df.ix[ indices[200] ].plot( kind='scatter', x='x', y='y', ax=ax, color='green' )
+df.ix[ indices[300] ].plot( kind='scatter', x='x', y='y', ax=ax, color='orange' )
+
+indices_df = pd.DataFrame( indices, columns=['n0', 'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9'] )
+df_new = pd.concat( [df, indices_df], axis=1 )
+>>> df_new.head()
+           x          y  n0   n1   n2   n3   n4   n5   n6   n7   n8   n9
+0  69.015924  45.045461   0  483  463   45  205  203  191  769  722  859
+1  91.528504   6.705613   1  960  467  531  318   72  814  630  171  798
+2  75.197110  54.450383   2   49  270  550  183  841  827  268  201  947
+3  45.015502  90.897385   3  256  166  406  400  297  631  374  912  502
+4  10.273140  12.816516   4  369  454  983  287  503  291  552  937  548
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+from sklearn.datasets import load_iris
+import pandas as pd
+
+iris= load_iris() 
+X = iris.data     
+Y = iris.target 
+
+iris_data = pd.DataFrame(X, columns=['Sepal Length', 'Sepal Width', 'Petal Length', 'Petal Width'])
+iris_target = pd.DataFrame(Y, columns=['Species'])
+
+def flower(num):
+    if num == 0:
+        return 'Setosa'
+    elif num == 1:
+        return 'Veriscolour'
+    else:
+        return 'Virginica'
+
+iris_target['Species'] = iris_target['Species'].apply(flower)
+iris = pd.concat([iris_data, iris_target], axis=1)
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_style('whitegrid')
+
+
+sns.pairplot(iris, hue = 'Species', size =2)
+sns.plt.show()
+
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.cross_validation import train_test_split
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.4, random_state=3) 
+
+knn = KNeighborsClassifier(n_neighbors=6) 
+knn.fit(X_train, Y_train)                 
+Y_pred = knn.predict(X_test)              
+
+from sklearn import metrics
+metrics.accuracy_score(Y_test, Y_pred)
+
+accuracy = []
+
+for k in range(1, 90):
+    knn = KNeighborsClassifier(n_neighbors=k) 
+    knn.fit(X_train, Y_train)                 
+    Y_pred = knn.predict(X_test)              
+    accuracy.append(metrics.accuracy_score(Y_test, Y_pred)) 
+
+k_range = range(1,90)
+
+plt.plot(k_range, accuracy)
+plt.show()

@@ -1,0 +1,33 @@
+import numpy as np
+import pandas as pd
+from sklearn import datasets
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegressionCV as LRCV
+
+# 準備資料(breast cancer乳癌資料集，共569個樣本，每個樣本有30個特徵)
+breast = datasets.load_breast_cancer()
+
+＃進行無量綱化，將特徵值縮放到[0,1]之間
+scaler = preprocessing.MinMaxScaler()
+data = scaler.fit_transform(breast['data'])
+target = breast['target']
+
+＃劃分訓練集與測試集
+X_train,X_test,y_train,y_test = train_test_split(data,target)
+
+#LogisticRegressionCV與LogisticRegression的主要差異在於
+#LRCV使用cross validation自行選擇C(正則化強度)。LR需要每次指定一個C
+#LR會將整個training set當作訓練資料，訓練模型
+#LRCV則會將traing set分成若干份，預設為10份，使用9份訓練，1份當作驗證集來評估模型參數優劣。多次驗證自動選擇最佳模型參數
+lr = LogisticRegression()
+lr.fit(X_train,y_train)
+Y_proba = lr.predict_proba(X_test)
+roc_auc_score(list(y_test),list(Y_proba[:,1]))
+
+lrcv=LRCV(max_iter=300)
+lrcv.fit(X_train,y_train)
+Y_proba = lrcv.predict_proba(X_test)
+roc_auc_score(list(y_test),list(Y_proba[:,1]))

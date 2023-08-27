@@ -1,0 +1,5 @@
+https://github.com/sugyan/tensorflow-mnist
+https://github.com/Fazelesswhite/Hotdog-Classification
+https://github.com/yahoo/TensorFlowOnSpark
+https://jizhi.im/blog/post/kaggle_silver
+http://blogs.sas.com/content/?s=which+machine+learning+algorithm+should+i+use

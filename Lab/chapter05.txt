@@ -1,0 +1,36 @@
+﻿step 1.
+下載graphviz執行檔(https://graphviz.org/download/)
+安裝graphviz執行環境
+設定PATH變數
+ "開始"->"電腦"(滑鼠右鍵)->"內容"->"進階系統設定"->"環境變數"->"系統變數"->編輯"Path",加入"C:\Program Files\Graphviz\bin\"
+重新開啟一個新DOS prompt用來驗證path是否正確設定
+ "開始"-> cmd(按下Enter)
+C:\Users\Admin>where gvcolor
+C:\Program Files\Graphviz\bin\gvcolor.exe  --需要能夠出現此行,才能證明PATH變數已經正確設定
+
+
+step 2.
+--安裝pydotplus模組,請確定開啟python 3.6版本的terminal
+C:\>pip install pydotplus    --移除方法為C:\>pip uninstall pydotplus
+Collecting pydotplus
+  Downloading pydotplus-2.0.2.tar.gz (278kB)
+    99% || 276kB 177kB/s eta 0:00:01
+    100% || 286kB 270kB/s
+Requirement already satisfied: pyparsing>=2.0.1 in c:\programdata\anaconda2\lib\site-packages (from
+pydotplus)
+Building wheels for collected packages: pydotplus
+  Running setup.py bdist_wheel for pydotplus ... done
+  Stored in directory: C:\Users\Administrator\AppData\Local\pip\Cache\wheels\43\31\48\e1d60511537b50
+a8ec28b130566d2fbbe4ac302b0def4baa48
+Successfully built pydotplus
+Installing collected packages: pydotplus
+Successfully installed pydotplus-2.0.2
+
+step 3
+--安裝graphviz模組
+C:\>pip install graphviz
+Collecting graphviz
+  Downloading graphviz-0.6-py2.py3-none-any.whl
+Installing collected packages: graphviz
+Successfully installed graphviz-0.6
+

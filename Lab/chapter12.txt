@@ -1,0 +1,117 @@
+#使用神經網路
+from sklearn import datasets
+cancer = datasets.load_breast_cancer()
+cancer.keys()
+cancer.target
+cancer['data'].shape
+cancer['target'].shape
+
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test = train_test_split(cancer['data'],cancer['target'])
+
+X_train.shape
+X_test
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train = scaler.transform(X_train)
+X_test = scaler.transform(X_test)
+
+from sklearn.neural_network import MLPClassifier
+mlp = MLPClassifier(hidden_layer_sizes=(10,10,10))   --Hidden layers有3層,每層有10個神經元
+mlp
+mlp.fit(X_train,y_train)
+predictions = mlp.predict(X_test)
+
+-----------------------------------------------------------
+mlp = MLPClassifier(hidden_layer_sizes=(20,20,20))
+mlp.fit(X_train,y_train)
+predictions = mlp.predict(X_test)
+-----------------------------------------------------------
+
+mlp.coefs_      # weight
+mlp.intercepts_ # bias
+mlp.coefs_[2] # layer (2) -> layer (2+1) 之間的權重
+mlp.coefs_[2][15]  # layer(2) -> layer(2+1)之間,第(15+1)個神經元的權重
+mlp.intercepts_[2] # lary (2+1)的bias
+mlp.intercepts_[2][15] # lary (2+1)的第(15+1)個神經元的bias
+
+from sklearn.metrics import classification_report,confusion_matrix
+confusion_matrix(y_test,predictions)
+
+0:惡性
+1:良性
+# pred  0    1
+array([[43,  4],    # y_test:0   -> 有4個應該是惡性腫瘤,但被判斷為良性
+       [ 2, 94]])   # y_test:1   -> 有2個應該是良性腫瘤,但被判斷為惡性
+
+classification_report(y_test,predictions)
+
+             precision    recall  f1-score   support
+           0       0.96      0.91      0.93        47
+           1       0.96      0.98      0.97        96
+ avg / total       0.96      0.96      0.96       143
+
+mlp.score(X_test,y_test)
+0.97202797202797198
+
+# mlp=MLPCLassifier(30,30,30)
+
+from sklearn import tree
+clf = tree.DecisionTreeClassifier(criterion='entropy',max_depth=5)
+clf = clf.fit(X_train,y_train)
+clf.score(X_test,y_test)
+0.91608391608391604
+
+predictions_tree = clf.predict(X_test)
+confusion_matrix(y_test,predictions)
+array([[43,  4],
+       [ 0, 96]])
+classification_report(y_test,predictions)
+             precision    recall  f1-score   support
+          0       1.00      0.91      0.96        47
+          1       0.96      1.00      0.98        96
+avg / total       0.97      0.97      0.97       143
+
+
+#反向傳遞範例
+import numpy as np
+import math
+import matplotlib.pyplot as plt 
+
+def sigmoid(h):
+    return 1.0 / (1.0 + np.exp(-h))
+
+def cost(t,o):
+    return pow((t-o),2)*0.5    
+
+Target = 0.0
+Input = 1.0
+Weight = 0.5
+Bias = -1.0
+Z = Input * Weight + Bias
+Output = sigmoid(Z)
+Cost = cost(Target,Output)
+X = []
+y = []
+
+for i in range(1000):
+    dCdO = Output-Target
+    dOdZ = Output*(1-Output)
+    dCdZ = dCdO * dOdZ
+    dCdB = dCdZ
+    dZdW = 1
+    dCdW = dCdZ*dZdW
+    LearningRate = 0.5
+    Weight = Weight - dCdW * LearningRate
+    Bias = Bias - dCdB * LearningRate
+    Z = Input * Weight + Bias
+    Output = sigmoid(Z)
+    Cost = cost(Target,Output)
+    print ('%d %10.10f' %(i,Cost))
+    X.append(i)
+    y.append(Cost)    
+
+plt.plot(X,y)
+plt.show()

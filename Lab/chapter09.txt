@@ -1,0 +1,144 @@
+#歐幾里德距離與馬氏距離
+import numpy as np  
+import pylab as pl  
+import scipy.spatial.distance as dist  
+def plotSamples(x, y, z=None):  
+    stars = np.matrix([[3., -2., 0.], [3., 2., 0.]])  
+    if z is not None:  
+        x, y = z * np.matrix([x, y])  
+        stars = z * stars  
+    pl.scatter(x, y, s=10)    # 畫gaussian隨機點  
+    pl.scatter(np.array(stars[0]), np.array(stars[1]), s=200, marker='*', color='r')  # 畫3個指定點 
+    pl.axhline(linewidth=2, color='g') # 畫X軸  
+    pl.axvline(linewidth=2, color='g')  # 畫Y軸  
+    pl.axis('equal')  
+    pl.axis([-5, 5, -5, 5])  
+    pl.show()  
+
+
+#產生高斯分佈的隨機點
+mean = [0, 0]      # 平均值  
+cov = [[2, 1], [1, 2]]   # Covariance(共異變數)  
+x, y = np.random.multivariate_normal(mean, cov, 1000).T  
+plotSamples(x, y)  
+covMat = np.matrix(np.cov(x, y))    # x與y的共異變數矩陣  
+Z = np.linalg.cholesky(covMat).I  # 邱列斯基矩陣  
+plotSamples(x, y, Z)  
+
+#馬氏距離  
+print '\n到原點的馬氏距離：'  
+print dist.mahalanobis([0,0], [3,3], covMat.I), dist.mahalanobis([0,0], [-2,2], covMat.I)  
+
+# 轉換後的歐幾里德距離  
+dots = (Z * np.matrix([[3, -2, 0], [3, 2, 0]])).T  
+print '\n轉換後的歐幾里德距離：'  
+print dist.minkowski([0, 0], np.array(dots[0]), 2), dist.minkowski([0, 0], np.array(dots[1]), 2)  
+
+
+  新奇
+#novelty detection
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.font_manager
+from sklearn import svm
+ 
+# 產生訓練資料
+X = 0.3 * np.random.randn(100, 2)
+X_train = np.r_[X + 2, X - 2]
+# 產生一些正常資料
+X = 0.3 * np.random.randn(20, 2)
+X_test = np.r_[X + 2, X - 2]
+# 產生一些異常資料
+X_outliers = np.random.uniform(low=-4, high=4, size=(20, 2))
+
+# 訓練
+clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=0.1)
+clf.fit(X_train)
+y_pred_train = clf.predict(X_train)
+y_pred_test = clf.predict(X_test)
+y_pred_outliers = clf.predict(X_outliers)
+n_error_train = y_pred_train[y_pred_train == -1].size
+n_error_test = y_pred_test[y_pred_test == -1].size
+n_error_outliers = y_pred_outliers[y_pred_outliers == 1].size
+ 
+# 繪圖
+xx, yy = np.meshgrid(np.linspace(-5, 5, 500), np.linspace(-5, 5, 500))
+Z = clf.decision_function(np.c_[xx.ravel(), yy.ravel()])
+Z = Z.reshape(xx.shape)
+ 
+plt.title("Novelty Detection")
+plt.contourf(xx, yy, Z, levels=np.linspace(Z.min(), 0, 7), cmap=plt.cm.Blues_r)
+a = plt.contour(xx, yy, Z, levels=[0], linewidths=2, colors='red')
+plt.contourf(xx, yy, Z, levels=[0, Z.max()], colors='orange')
+ 
+b1 = plt.scatter(X_train[:, 0], X_train[:, 1], c='white')
+b2 = plt.scatter(X_test[:, 0], X_test[:, 1], c='green')
+c = plt.scatter(X_outliers[:, 0], X_outliers[:, 1], c='red')
+plt.axis('tight')
+plt.xlim((-5, 5))
+plt.ylim((-5, 5))
+plt.legend([a.collections[0], b1, b2, c],
+           ["learned frontier", "training observations",
+            "new regular observations", "new abnormal observations"],
+           loc="upper left",
+           prop=matplotlib.font_manager.FontProperties(size=11))
+plt.xlabel(
+    "error train: %d/200 ; errors novel regular: %d/40 ; "
+    "errors novel abnormal: %d/40"
+    % (n_error_train, n_error_test, n_error_outliers))
+plt.show()
+
+#outlier detection
+import numpy as np
+from sklearn.covariance import EllipticEnvelope   #橢圓限界
+import matplotlib.pyplot as plt
+import matplotlib.font_manager
+
+X = 0.3 * np.random.randn(100, 2)
+X_train = np.r_[X + 2, X - 2]
+
+X = 0.3 * np.random.randn(20, 2)
+X_test = np.r_[X + 2, X - 2]
+
+X_outliers_train = np.random.uniform(low=-4, high=4, size=(10, 2))
+X_outliers_test = np.random.uniform(low=-4, high=4, size=(10, 2))
+
+X_train = np.concatenate((X_train,X_outliers_train),axis=0) 
+X_test = np.concatenate((X_test,X_outliers_test),axis=0) 
+
+clf = EllipticEnvelope()
+clf.fit(X_train)
+y_pred_train = clf.predict(X_train)
+y_pred_test = clf.predict(X_test)
+
+print ("Outlier detection result:",y_pred_test)
+n_error_train = y_pred_train[y_pred_train == -1].size
+n_error_test = y_pred_test[y_pred_test == -1].size
+
+xx, yy = np.meshgrid(np.linspace(-5, 5, 500), np.linspace(-5, 5, 500))
+
+Z = clf.decision_function(np.c_[xx.ravel(), yy.ravel()])
+
+Z = Z.reshape(xx.shape)
+plt.title("Outlier Detection")
+
+plt.contourf(xx, yy, Z, levels=np.linspace(Z.min(), 0, 7), cmap=plt.cm.Blues_r)
+a = plt.contour(xx, yy, Z, levels=[0], linewidths=2, colors='red')
+plt.contourf(xx, yy, Z, levels=[0, Z.max()], colors='orange')
+ 
+b1 = plt.scatter(X_train[:, 0], X_train[:, 1], c='white')
+b2 = plt.scatter(X_test[:, 0], X_test[:, 1], c='green')
+c = plt.scatter(X_outliers_test[:, 0], X_outliers_test[:, 1], c='red')
+plt.axis('tight')
+plt.xlim((-5, 5))
+plt.ylim((-5, 5))
+plt.legend([a.collections[0], b1, b2, c],
+           ["learned frontier", "training observations",
+            "new regular observations", "new abnormal observations"],
+           loc="upper left",
+           prop=matplotlib.font_manager.FontProperties(size=11))
+plt.xlabel(
+    "error train: %d/200 ; errors novel regular: %d/40 "
+    % (n_error_train, n_error_test))
+plt.show()
+

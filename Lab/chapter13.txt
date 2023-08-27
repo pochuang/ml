@@ -1,0 +1,37 @@
+﻿深度學習三巨頭(2019圖靈獎)
+ Geoffrey Hinton        --Google
+ Yann Le Cun(楊立昆)    --Facebook
+ Yoshua Bengio          --Microsoft
+  --Ian Goodfellow(GAN) --Google
+  
+--風格模擬範例
+使用MIT博士Anish Athalye所開發的範例碼
+https://github.com/anishathalye/neural-style
+
+下載圖片辨識模型VGG-19(深度19層：16個卷積層(分成5個卷積階段)，每個卷積階段都要有pooling層。但沒有全連結層。pooling方式使用max pooling)
+http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat
+
+將下載程式碼解壓縮後，再將VGG-19模型複製到程式碼目錄下。
+
+
+python 3.5
+$ python neural_style.py --content ./examples/taipei-101.jpg --styles ./examples/1-style.jpg --output ./examples/new_taipei-101.jpg
+
+Iteration    1/ 500
+Iteration    2/ 500
+...
+...
+Iteration  494/ 500
+Iteration  495/ 500
+Iteration  496/ 500
+Iteration  497/ 500
+Iteration  498/ 500
+Iteration  499/ 500
+Iteration  500/ 500
+  content loss: 817599
+    style loss: 196374
+       tv loss: 59133.8
+
+
+
+https://github.com/sugyan/tensorflow-mnist

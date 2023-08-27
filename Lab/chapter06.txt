@@ -1,0 +1,166 @@
+from sklearn import svm
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+import pandas as pd
+wine = pd.read_csv("C:\pyml_scripts\chapter06_svm\winequality-red.csv",sep=";")
+wine_except_quality = wine.drop("quality", axis=1)
+X = wine_except_quality.as_matrix() 
+y = wine['quality'].as_matrix()
+X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.2,random_state=123,stratify=y)
+
+clf_lin = svm.LinearSVC()
+
+--顯示LinearSVC可供調教的參數
+>>> clf_lin
+LinearSVC(C=1.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
+     verbose=0)
+
+clf_lin.fit(X_train,y_train) 
+ 
+>>> clf_lin.score(X_test,y_test)
+0.49062499999999998
+>>> clf_lin = svm.LinearSVC(C=10.)
+>>> clf_lin.fit(X_train,y_train)
+LinearSVC(C=10.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
+     verbose=0)
+>>> clf_lin.score(X_test,y_test)
+0.55312499999999998
+>>> clf_lin = svm.LinearSVC(C=100.)
+>>> clf_lin.fit(X_train,y_train)
+LinearSVC(C=100.0, class_weight=None, dual=True, fit_intercept=True,
+     intercept_scaling=1, loss='squared_hinge', max_iter=1000,
+     multi_class='ovr', penalty='l2', random_state=None, tol=0.0001,
+     verbose=0)
+>>> clf_lin.score(X_test,y_test)
+0.40312500000000001	 
+	 
+clf = svm.SVC()
+
+--顯示SVC可供調教的參數
+>>> clf
+SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape=None, degree=3, gamma='auto', kernel='rbf',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False)
+
+clf.fit(X_train,y_train)
+
+pred = clf.predict(X_test)
+pred
+array([6, 6, 6, 5, 5, 6, 6, 5, 5, 6, 5, 6, 6, 5, 6, 6, 6, 6, 6, 7, 5, 6, 5,
+       6, 6, 5, 6, 5, 6, 6, 6, 5, 6, 5, 5, 5, 5, 6, 5, 6, 6, 6, 6, 5, 6, 5,
+       6, 5, 5, 6, 6, 5, 6, 5, 5, 5, 6, 5, 5, 5, 6, 5, 5, 6, 7, 5, 6, 5, 5,
+       7, 5, 6, 5, 5, 6, 6, 5, 5, 5, 5, 6, 5, 6, 5, 5, 5, 5, 6, 6, 5, 6, 6,
+       7, 6, 6, 6, 5, 6, 5, 7, 5, 6, 5, 7, 5, 5, 6, 5, 5, 6, 7, 5, 6, 6, 6,
+       6, 6, 5, 5, 5, 5, 5, 6, 6, 5, 6, 6, 6, 5, 6, 5, 7, 5, 5, 5, 5, 5, 5,
+       5, 6, 5, 5, 5, 6, 5, 6, 5, 5, 6, 6, 5, 5, 5, 5, 5, 6, 5, 6, 6, 5, 5,
+       5, 5, 5, 5, 6, 6, 5, 6, 5, 6, 5, 6, 5, 5, 5, 6, 5, 6, 5, 6, 5, 6, 5,
+       5, 6, 5, 5, 6, 6, 6, 6, 6, 6, 6, 5, 6, 5, 6, 5, 6, 5, 5, 5, 6, 7, 6,
+       5, 5, 6, 6, 7, 6, 6, 6, 6, 6, 5, 6, 5, 5, 6, 6, 5, 6, 5, 5, 5, 5, 5,
+       5, 5, 5, 5, 5, 5, 7, 6, 6, 6, 6, 6, 5, 6, 6, 5, 5, 6, 6, 6, 6, 5, 5,
+       5, 5, 6, 6, 6, 5, 6, 6, 6, 5, 6, 5, 6, 6, 6, 5, 5, 5, 5, 7, 6, 5, 6,
+       6, 6, 6, 5, 6, 5, 5, 5, 6, 6, 6, 6, 5, 6, 5, 6, 5, 6, 6, 6, 6, 6, 6,
+       6, 5, 5, 5, 6, 6, 6, 7, 5, 5, 5, 5, 6, 5, 6, 6, 5, 6, 5, 6, 5])
+
+from sklearn.metrics import mean_squared_error, r2_score
+
+>>> print r2_score(y_test, pred)
+0.0653187238937
+>>> print mean_squared_error(y_test, pred)
+0.603125
+
+>>> clf.score(X_test,y_test)
+0.57187500000000002
+
+>>> pred = clf.predict(X_test[:1])
+>>> pred
+array([6])
+
+
+clf = svm.SVC(gamma=0.001,C=100.)
+clf.fit(X_train,y_train)
+pred = clf.predict(X_test)
+print r2_score(y_test, pred)
+print mean_squared_error(y_test, pred)
+>>> clf.score(X_test,y_test)
+0.56562500000000004
+
+
+clf = svm.SVC(gamma=0.1,C=0.01)
+clf.fit(X_train,y_train)
+pred = clf.predict(X_test)
+print r2_score(y_test, pred)
+print mean_squared_error(y_test, pred)
+>>> clf.score(X_test,y_test)
+0.42499999999999999
+
+
+>>> from sklearn import svm
+>>> import pandas as pd
+>>> import numpy as np
+>>> from sklearn.model_selection import train_test_split
+>>> import pandas as pd
+>>> wine = pd.read_csv("C:\pyml_scripts\chapter06_svm\winequality-red.csv",sep=";")
+>>> wine_except_quality = wine.drop("quality", axis=1)
+>>> X = wine_except_quality.as_matrix()
+>>> y = wine['quality'].as_matrix()
+>>> X_train, X_test, y_train, y_test = train_test_split(X, y,test_size=0.2,random_state=123,stratify=y)
+>>> clf = svm.SVC(kernel='poly',degree=2)   --degree=3將會hang住,無法結束
+>>> clf
+SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape=None, degree=2, gamma='auto', kernel='poly',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False)
+>>> clf.fit(X_train,y_train)
+SVC(C=1.0, cache_size=200, class_weight=None, coef0=0.0,
+  decision_function_shape=None, degree=2, gamma='auto', kernel='poly',
+  max_iter=-1, probability=False, random_state=None, shrinking=True,
+  tol=0.001, verbose=False)
+>>> clf.score(X_test,y_test)
+0.58437499999999998
+
+\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+from sklearn import datasets
+iris = datasets.load_iris()
+print(iris.data)
+print(iris.target)
+
+import sklearn
+from sklearn import cross_validation
+X_train, X_test, y_train, y_test = cross_validation.train_test_split(iris.data, iris.target, test_size=0.1, random_state=0)
+
+from sklearn import svm
+clf = svm.SVC()
+clf.fit(X_train, y_train)
+
+list(clf.predict(X_test))
+list(y_test)
+
+clf.score(X_test,y_test)
+--1.0
+
+from sklearn.decomposition import PCA
+pca = PCA(2)
+pca.fit_transform(X_train,y_train)
+
+from sklearn.pipeline import Pipeline
+clfp = Pipeline([
+        ('dim', PCA(2)),
+        ('svm', svm.SVC())
+    ])
+clfp.fit(X_train, y_train)
+clfp.score(X_test, y_test)
+--1.0
+
+clfp = Pipeline([
+        ('dim', PCA(1)),
+        ('svm', svm.SVC())
+    ])
+clfp.fit(X_train, y_train)
+clfp.score(X_test, y_test)
+--0.8666666666666667

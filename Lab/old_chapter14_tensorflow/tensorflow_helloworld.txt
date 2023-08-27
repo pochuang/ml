@@ -1,0 +1,181 @@
+>>> import tensorflow as tf
+>>> graph = tf.get_default_graph()
+>>> graph.get_operations()
+[]
+
+>>> input_value = tf.constant(1.0)
+>>> input_value
+<tf.Tensor 'Const:0' shape=() dtype=float32>
+
+>>> operations = graph.get_operations()
+>>> operations
+[<tf.Operation 'Const' type=Const>]
+
+
+#Protocol buffers ,google-strength JSON
+>>> operations[0].node_def
+name: "Const"
+op: "Const"
+attr {
+  key: "dtype"
+  value {
+    type: DT_FLOAT
+  }
+}
+attr {
+  key: "value"
+  value {
+    tensor {
+      dtype: DT_FLOAT
+      tensor_shape {
+      }
+      float_val: 1.0
+    }
+  }
+}
+
+>>> sess = tf.Session()
+>>> sess.run(input_value)
+1.0
+
+>>> weight = tf.Variable(0.8)
+>>> weight
+<tensorflow.python.ops.variables.Variable object at 0x10dacd8d0>
+>>> bias = tf.Variable(1.0)
+>>> bias
+<tensorflow.python.ops.variables.Variable object at 0x10dacd890>
+
+
+>>> for op in graph.get_operations():
+...     print(op.name)
+...
+Const
+Variable/initial_value
+Variable
+Variable/Assign
+Variable/read
+Variable_1/initial_value
+Variable_1
+Variable_1/Assign
+Variable_1/read
+
+>>> output_value = input_value * weight + bias
+
+>>> graph.get_operations()
+[<tf.Operation 'Const' type=Const>, 
+ <tf.Operation 'Variable/initial_value' type=Const>, 
+ <tf.Operation 'Variable' type=VariableV2>, 
+ <tf.Operation 'Variable/Assign' type=Assign>, 
+ <tf.Operation 'Variable/read' type=Identity>, 
+ <tf.Operation 'Variable_1/initial_value' type=Const>, 
+ <tf.Operation 'Variable_1' type=VariableV2>, 
+ <tf.Operation 'Variable_1/Assign' type=Assign>,
+ <tf.Operation 'Variable_1/read' type=Identity>, 
+ <tf.Operation 'mul' type=Mul>, 
+ <tf.Operation 'add' type=Add>]
+
+>>> graph.get_operations()[-1]
+<tf.Operation 'add' type=Add>
+
+>>> op = graph.get_operations()[-1]
+>>> op.name
+u'add'
+
+>>> for op_input in op.inputs:
+...     print(op_input)
+...
+Tensor("mul:0", shape=(), dtype=float32)
+Tensor("Variable_1/read:0", shape=(), dtype=float32)
+
+#未來版本不支援tf.initialize_all_variables(),請改為tf.global_variables_initializer()
+>>> init = tf.initialize_all_variables()
+WARNING:tensorflow:From <stdin>:1: initialize_all_variables (from tensorflow.python.ops.variables) is deprecated and will be removed after 2017-03-02.
+Instructions for updating:
+Use `tf.global_variables_initializer` instead.
+>>> init = tf.global_variables_initializer()
+>>> sess.run(init)
+>>> sess.run(output_value)
+1.8
+
+>>> x = tf.constant(1.0,name='input')
+>>> w = tf.Variable(0.5,name='weight')
+>>> b = tf.Variable(-1.0,name='bias')
+>>> z = tf.multiply(w,x)+b
+>>> y = tf.sigmoid(z,name='output')
+
+
+#目前版本不支援,需要變更為tf.summary.FileWriter
+>>> summary_writer = tf.train.SummaryWriter('log_simple_graph',sess.graph)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'module' object has no attribute 'SummaryWriter'
+
+>>> summary_writer = tf.summary.FileWriter('log_simple_graph',sess.graph)
+
+--開啟另一個terminal
+FrankMBP:~ Frank$ tensorboard --logdir=log_simple_graph
+Starting TensorBoard 41 on port 6006
+ --使用browser連線到6006 port
+(You can navigate to http://192.168.49.47:6006
+
+
+>>> y_ = tf.constant(0.0)
+>>> loss = 0.5*(y - y_)**2
+>>> optim = tf.train.GradientDescentOptimizer(learning_rate=0.5)
+
+>>> grads_and_vars = optim.compute_gradients(loss)
+>>> grads_and_vars
+[(None, <tensorflow.python.ops.variables.Variable object at 0x10dacd8d0>), (None, <tensorflow.python.ops.variables.Variable object at 0x10dacd890>), (<tf.Tensor 'gradients/Mul_grad/tuple/control_dependency:0' shape=() dtype=float32>, <tensorflow.python.ops.variables.Variable object at 0x114c222d0>), (<tf.Tensor 'gradients/add_1_grad/tuple/control_dependency_1:0' shape=() dtype=float32>, <tensorflow.python.ops.variables.Variable object at 0x114c0dbd0>), (None, <tensorflow.python.ops.variables.Variable object at 0x114bd1a10>)]
+
+>>> sess.run(tf.global_variables_initializer())
+
+
+>>> sess.run(grads_and_vars[1][0])
+0.088723458
+
+>>> sess.run(x)
+1.0
+>>> sess.run(w)
+0.5
+>>> sess.run(b)
+-1.0
+>>> sess.run(y)
+0.37754068
+>>> sess.run(z)
+-0.5
+>>> sess.run(optim.apply_gradients(grads_and_vars))
+>>> sess.run(w)
+0.45563826
+>>> sess.run(b)
+-1.0443617
+>>> sess.run(z)
+-0.58872342
+>>> sess.run(y)
+0.35692781
+>>> sess.run(y_)
+0.0
+
+>>> train_step = tf.train.GradientDescentOptimizer(0.5).minimize(loss)
+>>> for i in range(1000):
+...     sess.run(train_step)
+...
+>>> sess.run(x)
+1.0
+>>> sess.run(w)
+-1.1166023
+>>> sess.run(b)
+-2.6166027
+>>> sess.run(z)
+-3.7332048
+>>> sess.run(y)
+0.023357447
+>>> sess.run(loss)
+0.00027278517
+
+>>> summary_y = tf.scalar_summary('output',y)
+>>> summary_writer = tf.summary.FileWriter('log_simple_stats',sess.graph)
+>>> sess.run(tf.global_variables_initializer())
+>>> for i in range(1000):
+>>>     summary_str = sess.run(summary_y)
+>>>     tf.summary.FileWriter.add_summary(summary_str,i)
+>>>     sess.run(train_step)

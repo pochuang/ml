@@ -1,0 +1,279 @@
+﻿C:\>type c:\pyml_scripts\chapter02_regression\wslw.csv
+208,21.6
+152,15.5
+113,10.4
+227,31.0
+137,13.0
+238,32.4
+178,19.0
+104,10.4
+191,19.0
+130,11.8
+
+C:\> python
+
+--線性迴歸
+import pandas as pd
+from sklearn import linear_model
+import matplotlib.pyplot as plt
+
+--請將檔案位置,改為正確路徑
+dataframe = pd.read_csv('c:\pyml_scripts\chapter02_regression\wslw.csv',names=['Long','Width'])
+
+>>> dataframe
+   Long  Width
+0   208   21.6
+1   152   15.5
+2   113   10.4
+3   227   31.0
+4   137   13.0
+5   238   32.4
+6   178   19.0
+7   104   10.4
+8   191   19.0
+9   130   11.8
+
+x_values = dataframe[['Long']]
+y_values = dataframe[['Width']]
+Width_reg = linear_model.LinearRegression()
+
+>>> Width_reg
+LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)
+
+Width_reg.fit(x_values,y_values)
+
+#顯示此預測模型的正確性,越趨近1越好.但要注意是否會overfit(在訓練時,表現良好,但在預測時卻無法達到訓練時的效果)
+Width_reg.score(x_values,y_values)
+
+#描繪圖形,可以不執行
+plt.scatter(x_values,y_values,c='red')            #真實資料
+plt.plot(x_values,Width_reg.predict(x_values))    #x為真實資料,但y為使用預測模型所得的結果
+plt.show()
+
+
+#顯示預測值
+new_Y = Width_reg.predict(200)
+print new_Y
+
+
+
+--多項式迴歸
+import pandas as pd
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+from sklearn import linear_model
+import numpy as np
+import matplotlib.pyplot as plt
+dataframe = pd.read_csv('c:\pyml_scripts\chapter02_regression\poly_r.csv',names=['Long','Width'])
+x_values = dataframe[['Long']]
+y_values = dataframe[['Width']]
+plt.scatter(x_values,y_values,c='red')
+Width_reg = linear_model.LinearRegression()
+Width_reg.fit(x_values,y_values)
+plt.plot(x_values,Width_reg.predict(x_values))
+
+>>> Width_reg.score(x_values,y_values)
+0.85164122053836711    #正確性有點低,考慮採用其他種類的回歸演算法
+
+#改用Ridge regression
+>>> from sklearn.linear_model import Ridge
+>>> Width_reg = Ridge()
+>>> Width_reg.fit(x_values,y_values)
+Ridge(alpha=1.0, copy_X=True, fit_intercept=True, max_iter=None,
+   normalize=False, random_state=None, solver='auto', tol=0.001)
+>>> Width_reg.score(x_values,y_values)
+0.85164122053832236
+
+colors = ['green','purple','gold']
+for count,degree in enumerate([3,4,5]):
+    model = make_pipeline(PolynomialFeatures(degree),Ridge())
+    model.fit(x_values,y_values)
+    plt.plot(x_values,model.predict(x_values),color=colors[count],label="degree %d" % degree)
+
+plt.legend(loc=2)
+plt.show()
+
+
+--藉由變化degree找出最佳系數數量
+model = make_pipeline(PolynomialFeatures(3),Ridge())
+model.fit(x_values,y_values)
+
+>>> model.score(x_values,y_values)
+0.99111776070702595   #正確性比linear regression高得多,注意overfit
+
+model.predict(1000)
+
+
+--多元迴歸分析,有多個自變數
+--winequality-red
+
+Input variables (based on physicochemical tests): 
+1 - fixed acidity 
+2 - volatile acidity 
+3 - citric acid 
+4 - residual sugar 
+5 - chlorides 
+6 - free sulfur dioxide 
+7 - total sulfur dioxide 
+8 - density 
+9 - pH 
+10 - sulphates 
+11 - alcohol 
+Output variable (based on sensory data): 
+12 - quality (score between 0 and 10)
+
+
+import pandas as pd
+import numpy as np
+wine = pd.read_csv("c:\pyml_scripts\chapter02_regression\winequality-red.csv",sep=";")
+
+>>> wine.head()
+   fixed acidity  volatile acidity  citric acid  residual sugar  chlorides  \
+0            7.4              0.70         0.00             1.9      0.076
+1            7.8              0.88         0.00             2.6      0.098
+2            7.8              0.76         0.04             2.3      0.092
+3           11.2              0.28         0.56             1.9      0.075
+4            7.4              0.70         0.00             1.9      0.076
+
+   free sulfur dioxide  total sulfur dioxide  density    pH  sulphates  \
+0                 11.0                  34.0   0.9978  3.51       0.56
+1                 25.0                  67.0   0.9968  3.20       0.68
+2                 15.0                  54.0   0.9970  3.26       0.65
+3                 17.0                  60.0   0.9980  3.16       0.58
+4                 11.0                  34.0   0.9978  3.51       0.56
+
+   alcohol  quality
+0      9.4        5
+1      9.8        5
+2      9.8        5
+3      9.8        6
+4      9.4        5
+
+from sklearn import linear_model
+clf = linear_model.LinearRegression()
+X = wine.loc[:, ['density']].as_matrix()
+Y = wine['alcohol'].as_matrix()
+
+--顯示密度與酒精的關係
+import matplotlib.pyplot as plt
+plt.scatter(X,Y)
+clf.fit(X,Y)
+plt.plot(X,clf.predict(X),color="red")
+plt.show()
+
+--線性迴歸範例
+from sklearn import linear_model
+clf = linear_model.LinearRegression()
+wine_except_quality = wine.drop("quality", axis=1)
+X = wine_except_quality.as_matrix() 
+Y = wine['quality'].as_matrix()
+
+>>> X
+array([[  7.4  ,   0.7  ,   0.   , ...,   3.51 ,   0.56 ,   9.4  ],
+       [  7.8  ,   0.88 ,   0.   , ...,   3.2  ,   0.68 ,   9.8  ],
+       [  7.8  ,   0.76 ,   0.04 , ...,   3.26 ,   0.65 ,   9.8  ],
+       ...,
+       [  6.3  ,   0.51 ,   0.13 , ...,   3.42 ,   0.75 ,  11.   ],
+       [  5.9  ,   0.645,   0.12 , ...,   3.57 ,   0.71 ,  10.2  ],
+       [  6.   ,   0.31 ,   0.47 , ...,   3.39 ,   0.66 ,  11.   ]])
+>>> Y
+array([5, 5, 5, ..., 6, 5, 6], dtype=int64)
+
+clf.fit(X, Y) 
+
+clf.score(X, Y)
+0.36055170303868833
+--表示Linear Regression不適合此種資料
+
+print(pd.DataFrame({"Name":wine_except_quality.columns,"Coefficients":clf.coef_}).sort_values(by='Coefficients')) 
+
+    Coefficients                  Name
+7     -17.881164               density
+4      -1.874225             chlorides
+1      -1.083590      volatile acidity
+8      -0.413653                    pH
+2      -0.182564           citric acid
+6      -0.003265  total sulfur dioxide
+5       0.004361   free sulfur dioxide
+3       0.016331        residual sugar
+0       0.024991         fixed acidity
+10      0.276198               alcohol
+9       0.916334             sulphates
+
+print(clf.intercept_)
+
+21.9652084495
+
+--顯示各種物質與品質的相關性
+wine_coef = pd.DataFrame({"Name":wine_except_quality.columns,"Coefficients":clf.coef_})
+wine_coef_group = wine_coef.groupby('Name')
+wine_coef_sum = wine_coef_group.sum()
+wine_plot = wine_coef_sum.plot(kind='bar')
+ax = plt.axhline(y=0,color='black')
+
+--由於各種物質的單位不一致,所以必須先進行標準化
+wine2 = wine.apply(lambda x: (x - np.mean(x)) / (np.max(x) - np.min(x)))
+wine2_except_quality = wine.drop("quality", axis=1)
+X = wine2_except_quality.as_matrix()
+Y = wine2['quality'].as_matrix()
+clf.fit(X, Y)
+
+clf.score(X, Y)
+0.36055170303868822  --經過rescaling後,正確性還是不好,所以在此範例中,應該放棄使用LinearRegression
+
+print(pd.DataFrame({"Name":wine2_except_quality.columns,"Coefficients":clf.coef_}).sort_values(by='Coefficients'))
+
+    Coefficients                  Name
+7      -3.576233               density
+4      -0.374845             chlorides
+1      -0.216718      volatile acidity
+8      -0.082731                    pH
+2      -0.036513           citric acid
+6      -0.000653  total sulfur dioxide
+5       0.000872   free sulfur dioxide
+3       0.003266        residual sugar
+0       0.004998         fixed acidity
+10      0.055240               alcohol
+9       0.183267             sulphates
+
+print(clf.intercept_)
+
+3.26583718708
+
+--再次顯示各項物質與品質的相關性
+wine2_coef = pd.DataFrame({"Name":wine2_except_quality.columns,"Coefficients":clf.coef_})
+wine2_coef_group = wine2_coef.groupby('Name')
+wine2_coef_sum = wine2_coef_group.sum()
+wine2_plot = wine2_coef_sum.plot(kind='bar')
+ax = plt.axhline(y=0,color='black')
+plt.show()
+
+--使用其他迴歸模型
+from sklearn.linear_model import Ridge
+clf = Ridge()
+clf.fit(X, Y)
+
+clf.score(X, Y)
+0.3594798542473181
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+model = make_pipeline(PolynomialFeatures(3),Ridge())
+model.fit(X, Y)
+
+model.score(X, Y)
+0.54550474766729606
+
+model = make_pipeline(PolynomialFeatures(5),Ridge())
+model.fit(X, Y)
+
+model.score(X, Y)
+0.4756326048199272
+
+model = make_pipeline(PolynomialFeatures(4),Ridge())
+model.fit(X, Y)
+
+model.score(X, Y)
+0.70764258824279991
+

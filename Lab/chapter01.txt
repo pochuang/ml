@@ -1,0 +1,8 @@
+https://github.com/rushter/MLAlgorithms
+
+https://startupsventurecapital.com/essential-cheat-sheets-for-machine-learning-and-deep-learning-researchers-efb6a8ebd2e5
+https://docs.microsoft.com/zh-tw/azure/machine-learning/machine-learning-algorithm-cheat-sheet
+https://archive.ics.uci.edu/ml/datasets.html
+
+https://arxiv.org
+

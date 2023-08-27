@@ -1,0 +1,12 @@
+1.新建一個Environment(選擇Python 3.6)
+2.安裝必要模組(Scikit-Learn,Jupyter,pandas,gensim)
+3.jieba(結巴),wordcloud需要使用terminal方式安裝
+  c:\> pip install jieba gensim
+  c:\> pip install wordcloud
+  安裝wordcloud須要先安裝visual c++ build tools
+  http://landinghub.visualstudio.com/visual-cpp-build-tools
+4.下載必要的使用者字典,並轉換為txt(unicode編碼)
+  c:\pyml_scripts\jieba>python scel2txt.py kin_names.scel kin_names.txt
+
+#如果出現pip版本過舊的訊息
+#請使用"python -m pip install --upgrade --user pip"升級pip版本之後,在使用pip install

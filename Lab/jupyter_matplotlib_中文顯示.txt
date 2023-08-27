@@ -1,0 +1,6 @@
+matplotlib模組所繪製的圖中使用中文
+1.將NotoSansTC-Regular.otf字型檔案放在C:\ProgramData\Anaconda3\Lib\site-packages\matplotlib\mpl-data\fonts\ttf
+2.修改C:\ProgramData\Anaconda3\Lib\site-packages\matplotlib\mpl-data\matplotlibrc內容
+3.移除font.family的註解符號,並將其更改為font.family:Noto Sans TC
+4.刪除C:\Users\Admin\.matplotlib\text.cache之下的所有內容與C:\Users\Admin\.matplotlib\fontList.json
+5.使用Kernel->Restart&Run All重新執行一次
